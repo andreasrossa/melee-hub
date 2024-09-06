@@ -18,4 +18,9 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
     sessionsTable: sessions,
     verificationTokensTable: verificationTokens,
   }),
+  callbacks: {
+    signIn: ({ profile }) => {
+      return profile?.nickname === "reeno_ssbm";
+    },
+  },
 });
