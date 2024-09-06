@@ -3,6 +3,8 @@ import "~/styles/globals.css";
 import { GeistSans } from "geist/font/sans";
 import { type Metadata } from "next";
 
+import { SpeedInsights } from "@vercel/speed-insights/next";
+
 import { TRPCReactProvider } from "~/trpc/react";
 import { TooltipProvider } from "~/components/ui/tooltip";
 
@@ -22,6 +24,7 @@ export default function RootLayout({
           <TooltipProvider>{children}</TooltipProvider>
         </TRPCReactProvider>
       </body>
+      <SpeedInsights />
     </html>
   );
 }
