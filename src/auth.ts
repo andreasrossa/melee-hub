@@ -20,7 +20,8 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
   }),
   callbacks: {
     signIn: ({ profile }) => {
-      return profile?.nickname === "reeno_ssbm";
+      console.log(profile);
+      return profile?.username === "reeno_ssbm";
     },
   },
 });
