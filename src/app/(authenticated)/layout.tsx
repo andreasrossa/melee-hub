@@ -9,7 +9,6 @@ import {
   Settings2,
   Share,
   SquareTerminal,
-  SquareUser,
   Triangle,
   Turtle,
 } from "lucide-react";
@@ -23,13 +22,6 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "~/components/ui/drawer";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "~/components/ui/dropdown-menu";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import {
@@ -45,7 +37,9 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "~/components/ui/tooltip";
-import SignOutMenuItem from "./_components/SignOutMenuItem";
+import { auth } from "~/auth";
+import { redirect } from "next/navigation";
+import UserDropdown from "./_components/UserDropdown";
 
 export default async function Dashboard({
   children,
@@ -53,6 +47,11 @@ export default async function Dashboard({
   children: React.ReactNode;
 }) {
   const session = await auth();
+
+  if (!session) {
+    redirect("/");
+    return null;
+  }
 
   return (
     <div className="grid h-screen w-full pl-[53px]">
@@ -157,23 +156,7 @@ export default async function Dashboard({
           </Tooltip>
           <Tooltip>
             <TooltipTrigger asChild>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="mt-auto rounded-lg"
-                    aria-label="Account"
-                  >
-                    <SquareUser className="size-5" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent>
-                  <DropdownMenuItem>Profile</DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <SignOutMenuItem />
-                </DropdownMenuContent>
-              </DropdownMenu>
+              <UserDropdown session={session} />
             </TooltipTrigger>
             <TooltipContent side="right" sideOffset={5}>
               Account
