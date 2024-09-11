@@ -1,6 +1,3 @@
-import { File, ListFilter, PlusCircle } from "lucide-react";
-
-import { Button } from "~/components/ui/button";
 import {
   Card,
   CardContent,
@@ -8,76 +5,47 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "~/components/ui/dropdown-menu";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
-import ReplayTable from "./_components/ReplayTable";
+import { Select, SelectTrigger } from "~/components/ui/select";
+import { Separator } from "~/components/ui/separator";
+import { api, HydrateClient } from "~/trpc/server";
+import ReplayList from "./_components/ReplayList";
 
 export default function Page() {
+  void api.replay.list.prefetch();
+
   return (
-    <Tabs defaultValue="all">
-      <div className="flex w-full items-center">
-        <TabsList>
-          <TabsTrigger value="all">All</TabsTrigger>
-          <TabsTrigger value="active">Active</TabsTrigger>
-          <TabsTrigger value="draft">Draft</TabsTrigger>
-          <TabsTrigger value="archived" className="hidden sm:flex">
-            Archived
-          </TabsTrigger>
-        </TabsList>
-        <div className="ml-auto flex items-center gap-2">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="sm" className="h-7 gap-1">
-                <ListFilter className="h-3.5 w-3.5" />
-                <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-                  Filter
-                </span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Filter by</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuCheckboxItem checked>
-                Active
-              </DropdownMenuCheckboxItem>
-              <DropdownMenuCheckboxItem>Draft</DropdownMenuCheckboxItem>
-              <DropdownMenuCheckboxItem>Archived</DropdownMenuCheckboxItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-          <Button size="sm" variant="outline" className="h-7 gap-1">
-            <File className="h-3.5 w-3.5" />
-            <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-              Export
-            </span>
-          </Button>
-          <Button size="sm" className="h-7 gap-1">
-            <PlusCircle className="h-3.5 w-3.5" />
-            <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-              Add Product
-            </span>
-          </Button>
-        </div>
-      </div>
-      <TabsContent value="all">
-        <Card>
-          <CardHeader>
-            <CardTitle>Products</CardTitle>
-            <CardDescription>
-              Manage your products and view their sales performance.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ReplayTable />
-          </CardContent>
-        </Card>
-      </TabsContent>
-    </Tabs>
+    <HydrateClient>
+      <Card className="flex h-full flex-col">
+        <CardHeader className="">
+          <CardTitle>Replays</CardTitle>
+          <CardDescription>
+            Browse and filter replays to find the one you want to analyze.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="flex-1">
+          <div className="grid h-full w-full flex-1 gap-6 md:grid-cols-2 lg:grid-cols-[1fr,auto,1fr]">
+            <div className="relative hidden flex-col items-start gap-8 md:flex">
+              <form className="grid w-full items-start gap-6">
+                <fieldset className="grid gap-6 rounded-lg border p-4">
+                  <legend className="-ml-1 px-1 text-sm font-medium">
+                    Filter Replays
+                  </legend>
+                  <div className="gap-3">
+                    <Select>
+                      <SelectTrigger></SelectTrigger>
+                    </Select>
+                  </div>
+                </fieldset>
+              </form>
+            </div>
+            <Separator
+              orientation="vertical"
+              className="my-1 hidden h-auto lg:block"
+            />
+            <ReplayList />
+          </div>
+        </CardContent>
+      </Card>
+    </HydrateClient>
   );
 }

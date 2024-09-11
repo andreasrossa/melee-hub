@@ -19,26 +19,21 @@ import { type AdapterAccount } from "next-auth/adapters";
  */
 export const createTable = pgTableCreator((name) => `melee-hub_${name}`);
 
-export const posts = createTable(
-  "post",
-  {
-    id: serial("id").primaryKey(),
-    name: varchar("name", { length: 256 }),
-    createdById: varchar("created_by", { length: 255 })
-      .notNull()
-      .references(() => users.id),
-    createdAt: timestamp("created_at", { withTimezone: true })
-      .default(sql`CURRENT_TIMESTAMP`)
-      .notNull(),
-    updatedAt: timestamp("updated_at", { withTimezone: true }).$onUpdate(
-      () => new Date()
-    ),
-  },
-  (example) => ({
-    createdByIdIdx: index("created_by_idx").on(example.createdById),
-    nameIndex: index("name_idx").on(example.name),
-  })
-);
+export const replays = createTable("replay", {
+  id: serial("id").primaryKey(),
+  startedAt: timestamp("started_at", { withTimezone: true }).notNull(),
+  lastFrame: integer("last_frame").notNull(),
+  fileUrl: text("file_url").notNull(),
+  fileHash: text("file_hash").notNull(),
+  characterOne: integer("character_one").notNull(),
+  characterTwo: integer("character_two").notNull(),
+  playerOne: varchar("player_one", { length: 255 }),
+  playerTwo: varchar("player_two", { length: 255 }),
+  stageId: integer("stage_id").notNull(),
+  winner: integer("winner").notNull(),
+});
+
+export type Replay = typeof replays.$inferSelect;
 
 export const users = createTable("user", {
   id: varchar("id", { length: 255 })
@@ -53,6 +48,8 @@ export const users = createTable("user", {
   }).default(sql`CURRENT_TIMESTAMP`),
   image: varchar("image", { length: 255 }),
 });
+
+export type User = typeof users.$inferSelect;
 
 export const usersRelations = relations(users, ({ many }) => ({
   accounts: many(accounts),
@@ -84,8 +81,10 @@ export const accounts = createTable(
       columns: [account.provider, account.providerAccountId],
     }),
     userIdIdx: index("account_user_id_idx").on(account.userId),
-  })
+  }),
 );
+
+export type Account = typeof accounts.$inferSelect;
 
 export const accountsRelations = relations(accounts, ({ one }) => ({
   user: one(users, { fields: [accounts.userId], references: [users.id] }),
@@ -107,8 +106,10 @@ export const sessions = createTable(
   },
   (session) => ({
     userIdIdx: index("session_user_id_idx").on(session.userId),
-  })
+  }),
 );
+
+export type Session = typeof sessions.$inferSelect;
 
 export const sessionsRelations = relations(sessions, ({ one }) => ({
   user: one(users, { fields: [sessions.userId], references: [users.id] }),
@@ -126,5 +127,7 @@ export const verificationTokens = createTable(
   },
   (vt) => ({
     compoundKey: primaryKey({ columns: [vt.identifier, vt.token] }),
-  })
+  }),
 );
+
+export type VerificationToken = typeof verificationTokens.$inferSelect;
